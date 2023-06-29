@@ -17,9 +17,8 @@ with open("north_data/customers_data.csv", "r", encoding='utf-8') as file:
     current_row = 0
     for row in file_reader:
         if current_row != 0:
-            print(current_row)
-            print(row)
-            cur.execute("INSERT INTO customers VALUES (%s, %s, %s)", (row[0], row[1], row[2]))
+            print(len(row))
+            cur.execute("INSERT INTO customers VALUES (%s, %s, %s)", row)
         current_row += 1
 
 with open("north_data/employees_data.csv", "r", encoding='utf-8') as file:
@@ -27,9 +26,7 @@ with open("north_data/employees_data.csv", "r", encoding='utf-8') as file:
     current_row = 0
     for row in file_reader:
         if current_row != 0:
-            print(current_row)
-            print(row)
-            cur.execute("INSERT INTO employees VALUES (%s, %s, %s, %s, %s, %s)", (row[0], row[1], row[2], row[3], row[4], row[5]))
+            cur.execute("INSERT INTO employees VALUES (%s, %s, %s, %s, %s, %s)", row)
         current_row += 1
 
 with open("north_data/orders_data.csv", "r", encoding='utf-8') as file:
@@ -37,9 +34,7 @@ with open("north_data/orders_data.csv", "r", encoding='utf-8') as file:
     current_row = 0
     for row in file_reader:
         if current_row != 0:
-            print(current_row)
-            print(row)
-            cur.execute("INSERT INTO orders VALUES (%s, %s, %s, %s, %s)", (row[0], row[1], row[2], row[3], row[4]))
+            cur.execute("INSERT INTO orders VALUES (%s, %s, %s, %s, %s)", row)
         current_row += 1
 
 conn.commit()
