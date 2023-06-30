@@ -2,42 +2,46 @@
 import psycopg2
 import csv
 
+def csvtodb(filename):
+    """
+    Функция считывает данные из файла и записывает в таблицу базы данных
+    """
 
-conn = psycopg2.connect(
-    host="localhost",
-    database="north",
-    user="postgres",
-    password="postgres"
-)
+    # Открываем файл для чтения и подгружаем csv-данные
+    file = open(f"north_data/{filename}", "r", encoding='utf-8')
+    csv_data = csv.reader(file, delimiter=",")
 
-cur = conn.cursor()
+    # Создаем соединение с базой данных
+    conn = psycopg2.connect(
+        host="localhost",
+        database="north",
+        user="postgres",
+        password="postgres"
+    )
+    cur = conn.cursor()
 
-with open("north_data/customers_data.csv", "r", encoding='utf-8') as file:
-    file_reader = csv.reader(file, delimiter=",")
     current_row = 0
-    for row in file_reader:
-        if current_row != 0:
-            print(len(row))
-            cur.execute("INSERT INTO customers VALUES (%s, %s, %s)", row)
+    column_count = 0
+
+    # Определяем имя таблица по имени файла
+    table = filename[0:-9]
+
+    # Итерируем объект с csv-данными построчно и через SQL-команду
+    # записываем значения в очередную строкук таблицы
+    for row in csv_data:
+        if current_row == 0:
+            column_count = len(row)
+        else:
+            place_holders_string = (column_count * "%s, ")[0:-2]
+            cur.execute(f"INSERT INTO {table} VALUES ({place_holders_string})", row)
         current_row += 1
 
-with open("north_data/employees_data.csv", "r", encoding='utf-8') as file:
-    file_reader = csv.reader(file, delimiter=",")
-    current_row = 0
-    for row in file_reader:
-        if current_row != 0:
-            cur.execute("INSERT INTO employees VALUES (%s, %s, %s, %s, %s, %s)", row)
-        current_row += 1
+    conn.commit()
+    cur.close()
+    conn.close()
+    file.close()
 
-with open("north_data/orders_data.csv", "r", encoding='utf-8') as file:
-    file_reader = csv.reader(file, delimiter=",")
-    current_row = 0
-    for row in file_reader:
-        if current_row != 0:
-            cur.execute("INSERT INTO orders VALUES (%s, %s, %s, %s, %s)", row)
-        current_row += 1
 
-conn.commit()
-
-cur.close()
-conn.close()
+csvtodb("customers_data.csv")
+csvtodb("employees_data.csv")
+csvtodb("orders_data.csv")
